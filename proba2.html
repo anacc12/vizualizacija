@@ -29,26 +29,26 @@ svg {
       color: #222; 
       font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       font-size: 10px;
-      background: #fff; 
       border-radius: 3px;
       padding: .2em; 
       text-shadow: #f5f5f5 0 1px 0;
       opacity: 0.6; 
       position: absolute;
+      background-color: white;
 }
 
   </style>
 </head>
 
 <body>
-<svg width="940" height="480" style="background: white;"></svg>
+<svg width="940" height="480"></svg>
 <div class="tooltip"></div>
 <script>
 var margin = {top: 10, right: 10, bottom: 10, left: 10};
 var width = 960 - margin.left - margin.right;
 var height = 500 - margin.top - margin.bottom;
 var country_name;
-var country_names = [];
+
 /*var svg = d3
         .select("body")
         .append("svg")
@@ -61,27 +61,6 @@ var colors = d3.scaleLinear()
         .interpolate(d3.interpolateHcl)
         .range([d3.rgb("#70cbff"), d3.rgb("#436ca8")]);
 
-var colors2 =[
-"#5ee6bb",
-"#49ccc3",
-"#7bd8ed",
-"#40c5e3",
-"#40cf96",
-"#79a0ed",
-"#a98eed",
-"#886ce6",
-"#bf80f2",
-"#d5a4fc",
-"#f0a4fc",
-"#975eff",
-"#51dbd2",
-"#0fdfff",
-"#975eff",
-"#ff707e",
-"#ffba7d",
-"#ffb95e",
-"#ffe278",
-"#7dff78"];
 var projection = d3.geoNaturalEarth1()
                    .center([0, 15]) 
                    .rotate([-9,0])
@@ -95,8 +74,8 @@ var svg = d3.select("svg")
             .append("g")
             .attr("width", width)
             .attr("height", height);
+
 var tooltip = d3.select("div.tooltip");
-var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 d3.queue()
   .defer(d3.json, "./data/world_map.json")
@@ -118,45 +97,42 @@ function ready(error, world, names, songs) {
   })
   });
 
-  d3.select("body").append("div").attr("id", "songs").attr("class","row mb-2").style("background", "white").style("opacity", "0");
-  d3.select("body").append("div").attr("id", "songs2").attr("class","row").style("background", "white").style("opacity", "0");
-  d3.select("#songs").insert("div").attr("id", "songsDiv").attr("class", "col-sm-3");
-  d3.select("#songs2").insert("div").attr("id", "songsDiv2").attr("class", "col-sm-3");
+  d3.select("body").append("div").attr("id", "container").attr("class","container").style("background", "white").style("opacity", "0");
+  
 
   function showSongs(d){
-    if(d3.select("#songs").style("opacity", "1")){
-      d3.select("#songs").style("opacity", "0").html("");
-      d3.select("#songs2").style("opacity", "0").html("");
+    if(d3.select("#container").style("opacity", "1")){
+      d3.select("#container").style("opacity", "0").html("");
       window.location.hash = "svg"
     }
+    //d3.selectAll("#songs").insert("div").attr("id","titles_row").attr("class", "row");
 
+    d3.select("#container").append("div").attr("id", "songs").attr("class","row mb-2");
         country_name = d.name.toLowerCase();
         for(var i = 0; i<songs_dist.length; i++){
           if(country_name == songs_dist[i]) {
             for(var j = 0; j<songs.length; j++){
               if(songs_dist[i] == songs[j].country){
-                //d3.select("#songs").append("p").attr("id", "imgPar").attr("class", "col-sm-3")/*.html(songs[j].title)*/.style("padding", "10px");
-                //var br = j%8;
-                //d3.select("#songs").append("div").attr("id", "imgDiv").attr("class", "col-sm-3")/*.html(songs[j].title)*/.style("padding", "10px");
-                //d3.select("#songs").append("img").attr("src", songs[j].image).attr("class", "col-sm-3").style("padding", "30px");
-                //if(br == 0 || br == 1 || br == 2 || br == 3 ){
-                d3.select("#songs").insert("div").attr("class", "col-sm-3 d-flex justify-content-around p-3 mt-2 mb-2 text-uppercase").html(songs[j].title)
-                .style("background", "#73b3de")
+                d3.select("#songs").insert("div").attr("id", "titles").attr("class", "col-sm-3 d-flex justify-content-around p-3 mt-2 mb-2 text-uppercase").html(songs[j].title)
+                .style("background", "#9ccef0")
                 .style("font-size", "11px")
                 .style("font-weight", "1")
                 .style("color", "white")
-                .style("box-shadow", "0px -10px 5px -10px #888888");
-                //}
-                //else 
-                //d3.select("#songs2").insert("div").attr("class", "col-sm-3 justify-content").html(songs[j].title);
-              
+                .style("border-radius", "40px")
+                .style("box-shadow", "0px 0px 0px 3px #fff inset");
               }
+              
             } 
+
+            //d3.selectAll("#songs").append("div").attr("id","play_stop_row").attr("class", "row");
+            d3.selectAll("#titles").insert("div").attr("id", "play_stop_col").attr("class", "col-sm-6 d-flex justify-content-around");
+            d3.selectAll("#play_stop_col").insert("button").attr("id","play").attr("class", "d-flex justify-content-around display-block btn btn-sm btn-light").html("PLAY").style("font-weight", "2").style("font-size", "11px");
+            d3.selectAll("#play_stop_col").insert("button").attr("id","stop").attr("class", "d-flex justify-content-around display-block btn btn-sm").html("STOP").style("font-weight", "2").style("font-size", "11px").style("background","#5ba9de").style("outline", "none !important").style("color", "white");
+            
           }
         }
-     d3.select("#songs").transition().duration(800).style("opacity", "1");
-     d3.select("#songs2").transition().duration(800).style("opacity", "1");
-     window.location.hash = '#songs';  
+     d3.select("#container").transition().duration(1000).style("opacity", "1");
+     window.location.hash = '#container';  
   }
 
   svg.selectAll("path")
@@ -179,10 +155,22 @@ function ready(error, world, names, songs) {
           return tooltip.style("hidden", false).html(d.name);
         })
       .on("mousemove",function(d){
-          tooltip.classed("hidden", false)
-                 .style("top", (d3.event.pageY) + "px")
-                 .style("left", (d3.event.pageX + 10) + "px")
-                 .html(d.name);
+        country_name = d.name.toLowerCase();
+        for(var i = 0; i<songs_dist.length; i++){
+          if(country_name == songs_dist[i]) {
+            console.log("correct " + songs_dist[i] );
+            return tooltip.classed("hidden", false)
+                 .style("top", (d3.event.pageY + 5) + "px")
+                 .style("left", (d3.event.pageX + 5) + "px")
+                 .html(d.name).style("opacity", "1");
+          }
+        
+        }
+        return tooltip.classed("hidden", false)
+                 .style("top", (d3.event.pageY + 5) + "px")
+                 .style("left", (d3.event.pageX + 5) + "px")
+                 .html(d.name).style("opacity", "0.5");
+        
         })
       .on("mouseout",function(d,i){
           //d3.select(this).attr("fill","white").attr("stroke-width",1);
