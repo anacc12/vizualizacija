@@ -41,6 +41,7 @@ svg {
 </head>
 
 <body>
+<audio src="./music/ROSES.mp3" id="roses"></audio>
 <svg width="940" height="480"></svg>
 <div class="tooltip"></div>
 <script>
@@ -48,6 +49,7 @@ var margin = {top: 10, right: 10, bottom: 10, left: 10};
 var width = 960 - margin.left - margin.right;
 var height = 500 - margin.top - margin.bottom;
 var country_name;
+var audio;
 
 /*var svg = d3
         .select("body")
@@ -87,9 +89,9 @@ function ready(error, world, names, songs) {
   if (error) throw error;
 
  var songs_dist = _.keys(_.countBy(songs, function(song) { return song.country; }));
+ var titles_dist = _.keys(_.countBy(songs, function(song) { return song.title; }));
 
   var countries1 = topojson.feature(world, world.objects.countries).features;
-    
   var countries = countries1.filter(function(d) {
     return names.some(function(n) {
         if (d.id == n.id)
@@ -105,34 +107,55 @@ function ready(error, world, names, songs) {
       d3.select("#container").style("opacity", "0").html("");
       window.location.hash = "svg"
     }
-    //d3.selectAll("#songs").insert("div").attr("id","titles_row").attr("class", "row");
-
     d3.select("#container").append("div").attr("id", "songs").attr("class","row mb-2");
         country_name = d.name.toLowerCase();
         for(var i = 0; i<songs_dist.length; i++){
           if(country_name == songs_dist[i]) {
             for(var j = 0; j<songs.length; j++){
+             
               if(songs_dist[i] == songs[j].country){
-                d3.select("#songs").insert("div").attr("id", "titles").attr("class", "col-sm-3 d-flex justify-content-around p-3 mt-2 mb-2 text-uppercase").html(songs[j].title)
+                d3.select("#songs").insert("div").attr("id", "titles").attr("class", "col-sm-3 d-flex justify-content-around p-3 mt-2 mb-2 text-uppercase").text(songs[j].title)
                 .style("background", "#9ccef0")
                 .style("font-size", "11px")
                 .style("font-weight", "1")
                 .style("color", "white")
                 .style("border-radius", "40px")
                 .style("box-shadow", "0px 0px 0px 3px #fff inset");
-              }
-              
-            } 
 
-            //d3.selectAll("#songs").append("div").attr("id","play_stop_row").attr("class", "row");
-            d3.selectAll("#titles").insert("div").attr("id", "play_stop_col").attr("class", "col-sm-6 d-flex justify-content-around");
-            d3.selectAll("#play_stop_col").insert("button").attr("id","play").attr("class", "d-flex justify-content-around display-block btn btn-sm btn-light").html("PLAY").style("font-weight", "2").style("font-size", "11px");
-            d3.selectAll("#play_stop_col").insert("button").attr("id","stop").attr("class", "d-flex justify-content-around display-block btn btn-sm").html("STOP").style("font-weight", "2").style("font-size", "11px").style("background","#5ba9de").style("outline", "none !important").style("color", "white");
+                
+              }
+            }  
             
+            d3.selectAll("#titles").insert("div").attr("id", "play_stop_col").attr("class", "col-sm-6 d-flex justify-content-around");
+            d3.selectAll("#play_stop_col").insert("button").attr("id","play").attr("class", "d-flex justify-content-around display-block btn btn-sm").style("width", "30px").style("height", "30px");
+            d3.selectAll("#play_stop_col").insert("button").attr("id","stop").attr("class", "d-flex justify-content-around display-block btn btn-sm").style("width", "30px").style("height", "30px").style("outline", "none !important");
+            d3.selectAll("#play").append("img").attr("src", "./icons/play_button.png").style("height","25px").style("width", "25px");
+            d3.selectAll("#stop").append("img").attr("src", "./icons/pause_button.png").style("height","25px").style("width", "25px");            
           }
+          d3.selectAll("#play").on("click", play);
+          d3.selectAll("#stop").on("click", stop);
         }
+     //
      d3.select("#container").transition().duration(1000).style("opacity", "1");
      window.location.hash = '#container';  
+  }
+
+
+titles_dist.forEach(function(d){
+  console.log(d);
+})
+
+  function play(){
+    var title = d3.select(this.parentNode.parentNode).text();
+    if (typeof(title) != 'undefined' && title != null)
+      //if(title == "ROXANNE")
+        console.log(title);
+    else console.log("no"); 
+  }
+
+  function stop(){
+    console.log("stop")
+    audio.pause();
   }
 
   svg.selectAll("path")
@@ -177,6 +200,7 @@ function ready(error, world, names, songs) {
           tooltip.classed("hidden", true);
        })
        .on("click", showSongs);
+
 };
 
 </script>
