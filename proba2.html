@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/topojson.v2.min.js"></script>
+  <script src="https://d3js.org/d3-queue.v3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>
+
+
+  <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  <style>
+svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    margin: auto;
+    background-color: white;
+}
+.hidden {
+      display: none;
+}
+.tooltip {
+      color: #222; 
+      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 10px;
+      background: #fff; 
+      border-radius: 3px;
+      padding: .2em; 
+      text-shadow: #f5f5f5 0 1px 0;
+      opacity: 0.6; 
+      position: absolute;
+}
+
+  </style>
+</head>
+
+<body>
+<svg width="940" height="480" style="background: white;"></svg>
+<div class="tooltip"></div>
+<script>
+var margin = {top: 10, right: 10, bottom: 10, left: 10};
+var width = 960 - margin.left - margin.right;
+var height = 500 - margin.top - margin.bottom;
+var country_name;
+var country_names = [];
+/*var svg = d3
+        .select("body")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .style("background", "white");*/
+
+var colors = d3.scaleLinear()
+        .domain([1, 15])
+        .interpolate(d3.interpolateHcl)
+        .range([d3.rgb("#70cbff"), d3.rgb("#436ca8")]);
+
+var colors2 =[
+"#5ee6bb",
+"#49ccc3",
+"#7bd8ed",
+"#40c5e3",
+"#40cf96",
+"#79a0ed",
+"#a98eed",
+"#886ce6",
+"#bf80f2",
+"#d5a4fc",
+"#f0a4fc",
+"#975eff",
+"#51dbd2",
+"#0fdfff",
+"#975eff",
+"#ff707e",
+"#ffba7d",
+"#ffb95e",
+"#ffe278",
+"#7dff78"];
+var projection = d3.geoNaturalEarth1()
+                   .center([0, 15]) 
+                   .rotate([-9,0])
+                   .scale([1300/(2.5*Math.PI)]) 
+                   .translate([480,200]);
+
+var path = d3.geoPath()
+             .projection(projection);
+             
+var svg = d3.select("svg")
+            .append("g")
+            .attr("width", width)
+            .attr("height", height);
+var tooltip = d3.select("div.tooltip");
+var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+d3.queue()
+  .defer(d3.json, "./data/world_map.json")
+  .defer(d3.json, "./data/world_names.json")
+  .defer(d3.json, "./data/spotify_songs_country.json")
+  .await(ready);
+
+function ready(error, world, names, songs) {
+  if (error) throw error;
+
+ var songs_dist = _.keys(_.countBy(songs, function(song) { return song.country; }));
+
+  var countries1 = topojson.feature(world, world.objects.countries).features;
+    
+  var countries = countries1.filter(function(d) {
+    return names.some(function(n) {
+        if (d.id == n.id)
+        return d.name = n.name;
+  })
+  });
+
+  d3.select("body").append("div").attr("id", "songs").attr("class","row mb-2").style("background", "white").style("opacity", "0");
+  d3.select("body").append("div").attr("id", "songs2").attr("class","row").style("background", "white").style("opacity", "0");
+  d3.select("#songs").insert("div").attr("id", "songsDiv").attr("class", "col-sm-3");
+  d3.select("#songs2").insert("div").attr("id", "songsDiv2").attr("class", "col-sm-3");
+
+  function showSongs(d){
+    if(d3.select("#songs").style("opacity", "1")){
+      d3.select("#songs").style("opacity", "0").html("");
+      d3.select("#songs2").style("opacity", "0").html("");
+      window.location.hash = "svg"
+    }
+
+        country_name = d.name.toLowerCase();
+        for(var i = 0; i<songs_dist.length; i++){
+          if(country_name == songs_dist[i]) {
+            for(var j = 0; j<songs.length; j++){
+              if(songs_dist[i] == songs[j].country){
+                //d3.select("#songs").append("p").attr("id", "imgPar").attr("class", "col-sm-3")/*.html(songs[j].title)*/.style("padding", "10px");
+                //var br = j%8;
+                //d3.select("#songs").append("div").attr("id", "imgDiv").attr("class", "col-sm-3")/*.html(songs[j].title)*/.style("padding", "10px");
+                //d3.select("#songs").append("img").attr("src", songs[j].image).attr("class", "col-sm-3").style("padding", "30px");
+                //if(br == 0 || br == 1 || br == 2 || br == 3 ){
+                d3.select("#songs").insert("div").attr("class", "col-sm-3 d-flex justify-content-around p-3 mt-2 mb-2 text-uppercase").html(songs[j].title)
+                .style("background", "#73b3de")
+                .style("font-size", "11px")
+                .style("font-weight", "1")
+                .style("color", "white")
+                .style("box-shadow", "0px -10px 5px -10px #888888");
+                //}
+                //else 
+                //d3.select("#songs2").insert("div").attr("class", "col-sm-3 justify-content").html(songs[j].title);
+              
+              }
+            } 
+          }
+        }
+     d3.select("#songs").transition().duration(800).style("opacity", "1");
+     d3.select("#songs2").transition().duration(800).style("opacity", "1");
+     window.location.hash = '#songs';  
+  }
+
+  svg.selectAll("path")
+			.data(countries)
+			.enter()
+			.append("path")
+			.attr("d", path )
+      .style("fill", function(d, i){
+        country_name = d.name.toLowerCase();
+        for(var i = 0; i<songs_dist.length; i++){
+          if(country_name == songs_dist[i]) {
+            return colors(i);
+          }
+        }
+        return "#dee0e3";
+        })
+      .style("stroke-width", "0")
+      .style("stroke", "#dee0e3")
+			.on("mouseover",function(d,i){
+          return tooltip.style("hidden", false).html(d.name);
+        })
+      .on("mousemove",function(d){
+          tooltip.classed("hidden", false)
+                 .style("top", (d3.event.pageY) + "px")
+                 .style("left", (d3.event.pageX + 10) + "px")
+                 .html(d.name);
+        })
+      .on("mouseout",function(d,i){
+          //d3.select(this).attr("fill","white").attr("stroke-width",1);
+          tooltip.classed("hidden", true);
+       })
+       .on("click", showSongs);
+};
+
+</script>
+
+
+</body>
+</html>

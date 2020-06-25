@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Play Youtube Video On Click</title>
+  </head>
+  <body>
+    <audio src="./music/ROSES.mp3" id="roses"></audio>
+
+    <button id="play">
+      PLAY
+    </button>
+    <button onclick="stop()" id="stopButton">
+      STOP
+    </button>
+
+    <script>
+      var audio;
+      var x = document.getElementById("play");
+      x.onclick = function () {
+        audio = document.getElementById("roses");
+        audio.play();
+      };
+
+      function stop() {
+        audio.pause();
+      }
+    </script>
+  </body>
+</html>
