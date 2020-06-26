@@ -16,8 +16,7 @@
     "acous": 69,
     "spch": 9,
     "pop": 100,
-    "country": "argentina",
-    "image": "./img/roxanne.jpg"
+    "country": "argentina"
   },
   {
     "": 22,
@@ -36,8 +35,7 @@
     "acous": 3,
     "spch": 7,
     "pop": 97,
-    "country": "argentina",
-    "image": "./img/roxanne.jpg"
+    "country": "argentina"
   },
   {
     "": 23,
@@ -56,8 +54,7 @@
     "acous": 30,
     "spch": 30,
     "pop": 96,
-    "country": "argentina",
-    "image": "./img/roxanne.jpg"
+    "country": "argentina"
   },
   {
     "": 24,
@@ -76,8 +73,7 @@
     "acous": 8,
     "spch": 9,
     "pop": 94,
-    "country": "argentina",
-    "image": "./img/roxanne.jpg"
+    "country": "argentina"
   },
   {
     "": 25,
@@ -96,8 +92,7 @@
     "acous": 4,
     "spch": 19,
     "pop": 94,
-    "country": "argentina",
-    "image": "./img/roxanne.jpg"
+    "country": "argentina"
   },
   {
     "": 26,

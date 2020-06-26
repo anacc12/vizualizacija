@@ -11,6 +11,7 @@
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
     />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap" rel="stylesheet">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
@@ -22,12 +23,9 @@ svg {
     margin: auto;
     background-color: white;
 }
-.hidden {
-      display: none;
-}
-.tooltip {
-      color: #222; 
-      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+#tooltip {
+      color: rgb(49, 49, 49); 
+      font-family:'Montserrat', sans-serif;
       font-size: 10px;
       border-radius: 5px;
       padding: 2px;
@@ -35,14 +33,15 @@ svg {
       position: absolute;
       background-color: white;
 }
-
   </style>
 </head>
 
 <body>
+
 <audio id="audio"></audio>
+<div id="tooltip"></div>
 <svg width="940" height="480"></svg>
-<div class="tooltip"></div>
+
 <script>
 var margin = {top: 10, right: 10, bottom: 10, left: 10};
 var width = 960 - margin.left - margin.right;
@@ -51,13 +50,13 @@ var country_name;
 var audio;
 
 var colors = d3.scaleLinear()
-        .domain([1, 15])
+        .domain([1, 20])
         .interpolate(d3.interpolateHcl)
         .range([d3.rgb("#70cbff"), d3.rgb("#436ca8")]);
 
-var projection = d3.geoNaturalEarth1()
+var projection = d3.geoNaturalEarth1() //izvor: https://github.com/d3/d3-geo/blob/master/README.md#geoNaturalEarth1
                    .center([0, 15]) 
-                   .rotate([-9,0])
+                   .rotate([-10,0])
                    .scale([1300/(2.5*Math.PI)]) 
                    .translate([480,200]);
 
@@ -69,7 +68,7 @@ var svg = d3.select("svg")
             .attr("width", width)
             .attr("height", height);
 
-var tooltip = d3.select("div.tooltip");
+var tooltip = d3.select("#tooltip");
 
 d3.queue()
   .defer(d3.json, "./data/world_map.json")
@@ -83,8 +82,8 @@ function ready(error, world, names, songs) {
  var songs_dist = _.keys(_.countBy(songs, function(song) { return song.country; }));
  var titles_dist = _.keys(_.countBy(songs, function(song) { return song.title; }));
 
-  var countries1 = topojson.feature(world, world.objects.countries).features;
-  var countries = countries1.filter(function(d) {
+  var countries1 = topojson.feature(world, world.objects.countries).features; 
+  var countries = countries1.filter(function(d) { //izvor: https://blockbuilder.org/trianah/d30f56cce866cc9a08c00c40a13da68d
     return names.some(function(n) {
         if (d.id == n.id)
         return d.name = n.name;
@@ -92,7 +91,6 @@ function ready(error, world, names, songs) {
   });
 
   d3.select("body").append("div").attr("id", "container").attr("class","container").style("background", "white").style("opacity", "0");
-  
 
   function showSongs(d){
     if(d3.select("#container").style("opacity", "1")){
@@ -104,12 +102,12 @@ function ready(error, world, names, songs) {
         for(var i = 0; i<songs_dist.length; i++){
           if(country_name == songs_dist[i]) {
             for(var j = 0; j<songs.length; j++){
-             
               if(songs_dist[i] == songs[j].country){
                 d3.select("#songs").insert("div").attr("id", "titles").attr("class", "col-sm-3 d-flex justify-content-around p-3 mt-2 mb-2 text-uppercase").text(songs[j].title)
                 .style("background", "#9ccef0")
+                .style("font-family", "Montserrat', sans-serif")
                 .style("font-size", "11px")
-                .style("font-weight", "1")
+                .style("font-weight", "2")
                 .style("color", "white")
                 .style("border-radius", "40px")
                 .style("box-shadow", "0px 0px 0px 3px #fff inset"); 
@@ -119,8 +117,8 @@ function ready(error, world, names, songs) {
             d3.selectAll("#titles").insert("div").attr("id", "play_stop_col").attr("class", "col-sm-6 d-flex justify-content-around");
             d3.selectAll("#play_stop_col").insert("button").attr("id","play").attr("class", "d-flex justify-content-around display-block btn btn-sm").style("width", "30px").style("height", "30px");
             d3.selectAll("#play_stop_col").insert("button").attr("id","stop").attr("class", "d-flex justify-content-around display-block btn btn-sm").style("width", "30px").style("height", "30px").style("outline", "none !important");
-            d3.selectAll("#play").append("img").attr("src", "./icons/play_button.png").style("height","25px").style("width", "25px");
-            d3.selectAll("#stop").append("img").attr("src", "./icons/pause_button.png").style("height","25px").style("width", "25px");            
+            d3.selectAll("#play").append("img").attr("src", "./icons/play_button.png").style("height","20px").style("width", "20px");
+            d3.selectAll("#stop").append("img").attr("src", "./icons/pause_button.png").style("height","20px").style("width", "20px");            
           }
           d3.selectAll("#play").on("click", play);
           d3.selectAll("#stop").on("click", stop);
@@ -159,35 +157,31 @@ function ready(error, world, names, songs) {
         return "#dee0e3";
         })
       .style("stroke-width", "0")
-      .style("stroke", "#dee0e3")
-			.on("mouseover",function(d,i){
-          return tooltip.style("hidden", false).html(d.name);
+			.on("mouseover",function(d){
+          return tooltip.style("visibility", "visible").html(d.name);
         })
       .on("mousemove",function(d){
         country_name = d.name.toLowerCase();
         for(var i = 0; i<songs_dist.length; i++){
           if(country_name == songs_dist[i]) {
-            return tooltip.classed("hidden", false)
+            return tooltip.style("visibility", "visible")
                  .style("top", (d3.event.pageY + 5) + "px")
                  .style("left", (d3.event.pageX + 7) + "px")
-                 .html(d.name).style("opacity", "1");
+                 .style("opacity", "1")
+                 .html(d.name);
           }  
         }
-        return tooltip.classed("hidden", false)
+        return tooltip.style("visibility", "visible")
                  .style("top", (d3.event.pageY + 5) + "px")
                  .style("left", (d3.event.pageX + 7) + "px")
-                 .html(d.name).style("opacity", "0.5");
-        
+                 .style("opacity", "0.5")
+                 .html(d.name);
         })
-      .on("mouseout",function(d,i){
-          tooltip.classed("hidden", true);
+      .on("mouseout",function(d){
+          tooltip.style("visibility", "hidden");
        })
        .on("click", showSongs);
-
 };
-
 </script>
-
-
 </body>
 </html>
