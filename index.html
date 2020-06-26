@@ -29,9 +29,8 @@ svg {
       color: #222; 
       font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       font-size: 10px;
-      border-radius: 3px;
-      padding: .2em; 
-      text-shadow: #f5f5f5 0 1px 0;
+      border-radius: 5px;
+      padding: 2px;
       opacity: 0.6; 
       position: absolute;
       background-color: white;
@@ -41,7 +40,7 @@ svg {
 </head>
 
 <body>
-<audio src="./music/ROSES.mp3" id="roses"></audio>
+<audio id="audio"></audio>
 <svg width="940" height="480"></svg>
 <div class="tooltip"></div>
 <script>
@@ -50,13 +49,6 @@ var width = 960 - margin.left - margin.right;
 var height = 500 - margin.top - margin.bottom;
 var country_name;
 var audio;
-
-/*var svg = d3
-        .select("body")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .style("background", "white");*/
 
 var colors = d3.scaleLinear()
         .domain([1, 15])
@@ -120,9 +112,7 @@ function ready(error, world, names, songs) {
                 .style("font-weight", "1")
                 .style("color", "white")
                 .style("border-radius", "40px")
-                .style("box-shadow", "0px 0px 0px 3px #fff inset");
-
-                
+                .style("box-shadow", "0px 0px 0px 3px #fff inset"); 
               }
             }  
             
@@ -135,26 +125,22 @@ function ready(error, world, names, songs) {
           d3.selectAll("#play").on("click", play);
           d3.selectAll("#stop").on("click", stop);
         }
-     //
      d3.select("#container").transition().duration(1000).style("opacity", "1");
      window.location.hash = '#container';  
   }
 
-
-titles_dist.forEach(function(d){
-  console.log(d);
-})
-
   function play(){
+    audio = document.getElementById("audio");
     var title = d3.select(this.parentNode.parentNode).text();
-    if (typeof(title) != 'undefined' && title != null)
-      //if(title == "ROXANNE")
-        console.log(title);
-    else console.log("no"); 
+
+    if (typeof(title) != 'undefined' && title != null){
+      audio.src = "./music/" + title + ".mp3";
+      audio.play();
+  }
+  else console.log("Songs not available.");
   }
 
   function stop(){
-    console.log("stop")
     audio.pause();
   }
 
@@ -181,22 +167,19 @@ titles_dist.forEach(function(d){
         country_name = d.name.toLowerCase();
         for(var i = 0; i<songs_dist.length; i++){
           if(country_name == songs_dist[i]) {
-            console.log("correct " + songs_dist[i] );
             return tooltip.classed("hidden", false)
                  .style("top", (d3.event.pageY + 5) + "px")
-                 .style("left", (d3.event.pageX + 5) + "px")
+                 .style("left", (d3.event.pageX + 7) + "px")
                  .html(d.name).style("opacity", "1");
-          }
-        
+          }  
         }
         return tooltip.classed("hidden", false)
                  .style("top", (d3.event.pageY + 5) + "px")
-                 .style("left", (d3.event.pageX + 5) + "px")
+                 .style("left", (d3.event.pageX + 7) + "px")
                  .html(d.name).style("opacity", "0.5");
         
         })
       .on("mouseout",function(d,i){
-          //d3.select(this).attr("fill","white").attr("stroke-width",1);
           tooltip.classed("hidden", true);
        })
        .on("click", showSongs);
